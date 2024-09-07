@@ -1,11 +1,11 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { Home } from "@mui/icons-material";
+import HomePage from "../pages/HomePage";
 
 const HomeRoutes: React.FC = () => {
     return (
         <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<HomePage />} />
         </Routes>
     );
 };
