@@ -1,12 +1,13 @@
 import React from 'react';
+import {getGithubAuthenticationUrl, getRedirectUri} from "../../utility/GithubAuthenticationUtility";
 
 const GithubLoginButton: React.FC = () => {
-    const clientID = 'YOUR_GITHUB_CLIENT_ID';
-    const redirectUri = 'http://localhost:3000/auth/callback';
+    const clientID = process.env.REACT_APP_GITHUB_CLIENT_ID as string;
+    const redirectUri = getRedirectUri();
 
     const handleLogin = () => {
-        const githubLoginUrl = `https://github.com/login/oauth/authorize?client_id=${clientID}&redirect_uri=${encodeURIComponent(redirectUri)}`;
-        window.location.href = githubLoginUrl;
+        const authUrl = getGithubAuthenticationUrl(clientID, redirectUri);
+        window.location.href = authUrl;
     };
 
     return (

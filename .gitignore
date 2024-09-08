@@ -110,3 +110,4 @@ sketch
 # logo
 symbol.png
 *.png
+.env
