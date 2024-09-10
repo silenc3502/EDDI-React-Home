@@ -1,6 +1,4 @@
-// src/pages/GithubAuthorizeCode.tsx
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {useRecoilState} from "recoil";
 import {githubAuthenticationState} from "../atom_state/GithubAuthenticationState.";
