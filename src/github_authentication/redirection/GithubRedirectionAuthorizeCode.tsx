@@ -2,10 +2,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import {useRecoilState} from "recoil";
+import {githubAuthenticationState} from "../atom_state/GithubAuthenticationState.";
+import axiosInstance from "../../api/AxiosInstance";
 
 const GithubAuthorizeCode: React.FC = () => {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [authenticationState, setAuthenticationState] = useRecoilState(githubAuthenticationState);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -16,27 +18,34 @@ const GithubAuthorizeCode: React.FC = () => {
 
             if (code) {
                 try {
-                    // Spring 서버로 액세스 토큰 요청
-                    const response = await axios.post('http://localhost:8080/github/access-token', { code });
+                    const response = await axiosInstance.post('/github/access-token', { code });
+                    console.log('Access Token Response:', response.data);
 
                     // const accessToken = response.data.accessToken;
                     // navigate('/account/apply');
                 } catch (err) {
-                    setError('Failed to get access token');
+                    setAuthenticationState({
+                        loading: false,
+                        error: 'Failed to get access token',
+                        userToken: null,
+                    });
                 } finally {
-                    setLoading(false);
+                    setAuthenticationState((prevState) => ({ ...prevState, loading: false, userToken: null }));
                 }
             } else {
-                setError('Authorization code is missing');
-                setLoading(false);
+                setAuthenticationState({
+                    loading: false,
+                    error: 'Authorization code is missing',
+                    userToken: null
+                });
             }
         };
 
         fetchAccessToken();
-    }, [navigate]);
+    }, [navigate, setAuthenticationState]);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>{error}</p>;
+    if (authenticationState.loading) return <p>Loading...</p>;
+    if (authenticationState.error) return <p>{authenticationState.error}</p>;
 
     return <div>Processing...</div>;
 };
