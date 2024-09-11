@@ -57,7 +57,23 @@ const AccountApplyPage: React.FC = () => {
     };
 
     const handleCheckEmail = async () => {
-        
+        setEmailCheckLoading(true);
+        setEmailError(null);
+        try {
+            const response = await axiosInstance.post('/account/check-email-duplication', {
+                email: accountInfo.email
+            });
+            if (response.data) {
+                setEmailError('Email is already taken.');
+            } else {
+                setEmailError(null);
+            }
+        } catch (error) {
+            console.error('Error checking email duplication:', error);
+            setEmailError('Error checking email duplication.');
+        } finally {
+            setEmailCheckLoading(false);
+        }
     };
 
     return (
@@ -135,6 +151,21 @@ const AccountApplyPage: React.FC = () => {
                         }
                     }}
                 />
+                <Button
+                    onClick={handleCheckEmail}
+                    variant="outlined"
+                    sx={{
+                        marginLeft: '1rem',
+                        height: 56,
+                        display: 'flex',
+                        alignItems: 'center',
+                        whiteSpace: 'nowrap',
+                        minWidth: '140px',
+                        marginTop: '8px'
+                    }}
+                >
+                    Check Email
+                </Button>
             </Box>
 
             <Box
