@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import {useRecoilState} from "recoil";
 import {githubAuthenticationState} from "../atom_state/GithubAuthenticationState.";
 import axiosInstance from "../../api/AxiosInstance";
+import {accountInfoState} from "../../account/atom_state/AccountState";
 
 const GithubAuthorizeCode: React.FC = () => {
     const [authenticationState, setAuthenticationState] = useRecoilState(githubAuthenticationState);
+    const [accountInfo, setAccountInfo] = useRecoilState(accountInfoState)
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -17,10 +19,11 @@ const GithubAuthorizeCode: React.FC = () => {
             if (code) {
                 try {
                     const response = await axiosInstance.post('/github/access-token', { code });
-                    console.log('Access Token Response:', response.data);
+                    const { login, email } = response.data
 
-                    // const accessToken = response.data.accessToken;
-                    // navigate('/account/apply');
+                    setAccountInfo({ nickname: login, email})
+
+                    navigate('/account/apply');
                 } catch (err) {
                     setAuthenticationState({
                         loading: false,
