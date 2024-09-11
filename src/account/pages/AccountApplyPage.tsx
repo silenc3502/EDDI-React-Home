@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import Box from "@mui/material/Box";
-import {TextField} from "@mui/material";
-import {useRecoilState} from "recoil";
-import axiosInstance from "../../api/AxiosInstance";
-import {accountInfoState} from "../atom_state/AccountState";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import { TextField, Button, Typography } from "@mui/material";
+import { useRecoilState } from "recoil";
+import { accountInfoState } from "../atom_state/AccountState";
 import AccountApplyButton from "../ui/button/AccountApplyButton";
+import axiosInstance from "../../api/AxiosInstance";
 
 const AccountApplyPage: React.FC = () => {
     const [accountInfo, setAccountInfo] = useRecoilState(accountInfoState);
+    const [loading, setLoading] = useState(false);
+    const [nicknameCheckLoading, setNicknameCheckLoading] = useState(false);
+    const [emailCheckLoading, setEmailCheckLoading] = useState(false);
+    const [nicknameError, setNicknameError] = useState<string | null>(null);
+    const [emailError, setEmailError] = useState<string | null>(null);
 
     const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setAccountInfo((prevState) => ({
@@ -19,6 +22,7 @@ const AccountApplyPage: React.FC = () => {
     };
 
     const handleSubmit = async () => {
+        setLoading(true);
         try {
             const response = await axiosInstance.post('/account/apply', {
                 nickname: accountInfo.nickname,
@@ -27,7 +31,33 @@ const AccountApplyPage: React.FC = () => {
             console.log('Account apply success:', response.data);
         } catch (error) {
             console.error('Account apply failed:', error);
+        } finally {
+            setLoading(false);
         }
+    };
+
+    const handleCheckNickname = async () => {
+        setNicknameCheckLoading(true);
+        setNicknameError(null);
+        try {
+            const response = await axiosInstance.post('/account/check-nickname-duplication', {
+                nickname: accountInfo.nickname
+            });
+            if (response.data) {
+                setNicknameError('Nickname is already taken.');
+            } else {
+                setNicknameError(null);
+            }
+        } catch (error) {
+            console.error('Error checking nickname duplication:', error);
+            setNicknameError('Error checking nickname duplication.');
+        } finally {
+            setNicknameCheckLoading(false);
+        }
+    };
+
+    const handleCheckEmail = async () => {
+        
     };
 
     return (
@@ -47,27 +77,86 @@ const AccountApplyPage: React.FC = () => {
                 Apply for Account
             </Typography>
 
-            <TextField
-                label="Nickname"
-                value={accountInfo.nickname}
-                onChange={handleNicknameChange}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-            />
-
-            <TextField
-                label="Email"
-                value={accountInfo.email}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                InputProps={{
-                    readOnly: true,
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    marginBottom: '1rem'
                 }}
-            />
+            >
+                <TextField
+                    label="Nickname"
+                    value={accountInfo.nickname}
+                    onChange={handleNicknameChange}
+                    variant="outlined"
+                    margin="normal"
+                    fullWidth
+                    sx={{ height: 56 }}
+                />
+                <Button
+                    onClick={handleCheckNickname}
+                    variant="outlined"
+                    sx={{
+                        marginLeft: '1rem',
+                        height: 56,
+                        display: 'flex',
+                        alignItems: 'center',
+                        whiteSpace: 'nowrap',
+                        minWidth: '140px',
+                        marginTop: '8px'
+                    }}
+                >
+                    Check Nickname
+                </Button>
+            </Box>
 
-            <AccountApplyButton onClick={handleSubmit} />
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    width: '100%',
+                    marginBottom: '1rem'
+                }}
+            >
+                <TextField
+                    label="Email"
+                    value={accountInfo.email}
+                    variant="outlined"
+                    margin="normal"
+                    fullWidth
+                    InputProps={{
+                        readOnly: true,
+                    }}
+                    sx={{
+                        height: 56,
+                        '& .MuiInputBase-root': {
+                            height: '100%',
+                        }
+                    }}
+                />
+            </Box>
+
+            <Box
+                sx={{
+                    display: 'flex',
+                    gap: '1rem',
+                    marginTop: '1rem'
+                }}
+            >
+                <AccountApplyButton
+                    onClick={handleSubmit}
+                    loading={loading}
+                    sx={{ flexGrow: 1 }}
+                />
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => console.log('Cancel clicked')}
+                >
+                    Cancel
+                </Button>
+            </Box>
         </Box>
     );
 };
