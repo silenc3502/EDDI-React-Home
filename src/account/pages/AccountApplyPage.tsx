@@ -6,6 +6,7 @@ import axiosInstance from "../../api/AxiosInstance";
 import {accountInfoState} from "../atom_state/AccountState";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
+import AccountApplyButton from "../ui/button/AccountApplyButton";
 
 const AccountApplyPage: React.FC = () => {
     const [accountInfo, setAccountInfo] = useRecoilState(accountInfoState);
@@ -19,16 +20,13 @@ const AccountApplyPage: React.FC = () => {
 
     const handleSubmit = async () => {
         try {
-            // Send updated account info to the backend
             const response = await axiosInstance.post('/account/apply', {
                 nickname: accountInfo.nickname,
                 email: accountInfo.email
             });
             console.log('Account apply success:', response.data);
-            // Optionally handle success feedback
         } catch (error) {
             console.error('Account apply failed:', error);
-            // Optionally handle error feedback
         }
     };
 
@@ -69,14 +67,7 @@ const AccountApplyPage: React.FC = () => {
                 }}
             />
 
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={handleSubmit}
-                sx={{ marginTop: '1rem' }}
-            >
-                Apply Member
-            </Button>
+            <AccountApplyButton onClick={handleSubmit} />
         </Box>
     );
 };
