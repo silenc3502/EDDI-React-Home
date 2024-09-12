@@ -5,6 +5,9 @@ import { useRecoilState } from "recoil";
 import { accountInfoState } from "../atom_state/AccountState";
 import AccountApplyButton from "../ui/button/AccountApplyButton";
 import axiosInstance from "../../api/AxiosInstance";
+import ApplyCancelButton from "../ui/button/ApplyCancelButton";
+import CheckEmailDuplicationButton from "../ui/button/CheckEmailDuplicationButton";
+import EmailInputTextField from "../ui/text_field/EmailInputTextField";
 
 const AccountApplyPage: React.FC = () => {
     const [accountInfo, setAccountInfo] = useRecoilState(accountInfoState);
@@ -135,37 +138,8 @@ const AccountApplyPage: React.FC = () => {
                     marginBottom: '1rem'
                 }}
             >
-                <TextField
-                    label="Email"
-                    value={accountInfo.email}
-                    variant="outlined"
-                    margin="normal"
-                    fullWidth
-                    InputProps={{
-                        readOnly: true,
-                    }}
-                    sx={{
-                        height: 56,
-                        '& .MuiInputBase-root': {
-                            height: '100%',
-                        }
-                    }}
-                />
-                <Button
-                    onClick={handleCheckEmail}
-                    variant="outlined"
-                    sx={{
-                        marginLeft: '1rem',
-                        height: 56,
-                        display: 'flex',
-                        alignItems: 'center',
-                        whiteSpace: 'nowrap',
-                        minWidth: '160px',
-                        marginTop: '8px'
-                    }}
-                >
-                    Check Email
-                </Button>
+                <EmailInputTextField value={accountInfo.email} />
+                <CheckEmailDuplicationButton onClick={handleCheckEmail} />
             </Box>
 
             <Box
@@ -180,13 +154,9 @@ const AccountApplyPage: React.FC = () => {
                     loading={loading}
                     sx={{ flexGrow: 1 }}
                 />
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => console.log('Cancel clicked')}
-                >
-                    Cancel
-                </Button>
+                <ApplyCancelButton
+                    sx={{ flexGrow: 1 }}
+                />
             </Box>
         </Box>
     );
