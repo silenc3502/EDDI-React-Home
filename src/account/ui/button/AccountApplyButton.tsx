@@ -15,7 +15,10 @@ const AccountApplyButton: React.FC<AccountApplyButtonProps> = ({ onClick, loadin
             color="primary"
             onClick={onClick}
             disabled={loading}
-            sx={sx}
+            sx={{
+                ...sx,
+                height: 56,
+            }}
         >
             {loading ? 'Loading...' : 'Apply Member'}
         </Button>
