@@ -119,7 +119,7 @@ const AccountApplyPage: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         whiteSpace: 'nowrap',
-                        minWidth: '140px',
+                        minWidth: '160px',
                         marginTop: '8px'
                     }}
                 >
@@ -160,7 +160,7 @@ const AccountApplyPage: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         whiteSpace: 'nowrap',
-                        minWidth: '140px',
+                        minWidth: '160px',
                         marginTop: '8px'
                     }}
                 >
