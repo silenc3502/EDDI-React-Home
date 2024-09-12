@@ -5,28 +5,29 @@ import { accountInfoState } from "../../atom_state/AccountState";
 import axiosInstance from "../../../api/AxiosInstance";
 
 interface CheckEmailDuplicationButtonProps {
-    onError: (error: string | null) => void; // Callback to handle error messages
+    onCheckSuccess: () => void;
+    onCheckFailure: () => void;
 }
 
-const CheckEmailDuplicationButton: React.FC<CheckEmailDuplicationButtonProps> = ({ onError }) => {
-    const [accountInfo, setAccountInfo] = useRecoilState(accountInfoState);
+const CheckEmailDuplicationButton: React.FC<CheckEmailDuplicationButtonProps> = ({ onCheckFailure, onCheckSuccess }) => {
+    const [accountInfo] = useRecoilState(accountInfoState);
     const [emailCheckLoading, setEmailCheckLoading] = useState(false);
 
     const handleCheckEmail = async () => {
         setEmailCheckLoading(true);
-        onError(null); // Clear previous errors
+
         try {
             const response = await axiosInstance.post('/account/check-email-duplication', {
                 email: accountInfo.email
             });
             if (response.data) {
-                onError('Email is already taken.');
+                onCheckFailure();  // 중복일 경우 실패 처리
             } else {
-                onError(null);
+                onCheckSuccess();  // 사용 가능할 경우 성공 처리
             }
         } catch (error) {
             console.error('Error checking email duplication:', error);
-            onError('Error checking email duplication.');
+            onCheckFailure();  // 요청 실패 시 실패 처리
         } finally {
             setEmailCheckLoading(false);
         }
@@ -53,3 +54,4 @@ const CheckEmailDuplicationButton: React.FC<CheckEmailDuplicationButtonProps> = 
 };
 
 export default CheckEmailDuplicationButton;
+

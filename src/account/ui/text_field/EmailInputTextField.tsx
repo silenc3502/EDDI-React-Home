@@ -3,16 +3,17 @@ import TextField from '@mui/material/TextField';
 
 interface EmailInputTextFieldProps {
     value: string;
-    error?: string | null; // Allow null value
+    error?: string | null;
+    success: string | null;
 }
 
-const EmailInputTextField: React.FC<EmailInputTextFieldProps> = ({ value, error }) => {
+const EmailInputTextField: React.FC<EmailInputTextFieldProps> = ({ value, error, success }) => {
     return (
         <TextField
             label="Email"
             value={value}
-            error={!!error} // Show error state if error is not null or undefined
-            helperText={error || ''} // Display error message
+            error={!!error}
+            helperText={error || success}
             variant="outlined"
             margin="normal"
             fullWidth

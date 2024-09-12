@@ -7,30 +7,26 @@ import axiosInstance from "../../../api/AxiosInstance";
 interface CheckNicknameDuplicationButtonProps {
     onCheckSuccess: () => void;
     onCheckFailure: () => void;
-    setError: (error: string | null) => void;
 }
 
-const CheckNicknameDuplicationButton: React.FC<CheckNicknameDuplicationButtonProps> = ({ onCheckSuccess, onCheckFailure, setError }) => {
+const CheckNicknameDuplicationButton: React.FC<CheckNicknameDuplicationButtonProps> = ({ onCheckFailure, onCheckSuccess }) => {
     const [accountInfo] = useRecoilState(accountInfoState);
     const [loading, setLoading] = useState(false);
 
     const handleCheckNickname = async () => {
         setLoading(true);
-        setError(null);
+
         try {
             const response = await axiosInstance.post('/account/check-nickname-duplication', {
                 nickname: accountInfo.nickname
             });
             if (response.data) {
-                setError('Nickname is already taken.');
-                onCheckFailure();
+                onCheckFailure()
             } else {
-                setError(null);
-                onCheckSuccess();
+                onCheckSuccess()
             }
         } catch (error) {
             console.error('Error checking nickname duplication:', error);
-            setError('Error checking nickname duplication.');
             onCheckFailure();
         } finally {
             setLoading(false);

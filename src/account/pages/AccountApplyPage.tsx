@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import Box from "@mui/material/Box";
-import { TextField, Button, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { useRecoilState } from "recoil";
 import { accountInfoState } from "../atom_state/AccountState";
 import AccountApplyButton from "../ui/button/AccountApplyButton";
-import axiosInstance from "../../api/AxiosInstance";
 import ApplyCancelButton from "../ui/button/ApplyCancelButton";
 import CheckEmailDuplicationButton from "../ui/button/CheckEmailDuplicationButton";
 import EmailInputTextField from "../ui/text_field/EmailInputTextField";
 import NicknameInputTextField from "../ui/text_field/NicknameInputTextField";
 import CheckNicknameDuplicationButton from "../ui/button/CheckNicknameDuplicationButton";
-import {buttonStyles} from "../ui/style/ButtonStyles";
-import {buttonContainerStyles} from "../ui/style/ButtonContainerStyles";
-import {inputContainerStyles} from "../ui/style/InputContainerStyles";
-import {containerStyles} from "../ui/style/ContainerStyles";
+import { buttonStyles } from "../ui/style/ButtonStyles";
+import { buttonContainerStyles } from "../ui/style/ButtonContainerStyles";
+import { inputContainerStyles } from "../ui/style/InputContainerStyles";
+import { containerStyles } from "../ui/style/ContainerStyles";
 
 const AccountApplyPage: React.FC = () => {
     const [accountInfo, setAccountInfo] = useRecoilState(accountInfoState);
@@ -22,14 +21,34 @@ const AccountApplyPage: React.FC = () => {
     const [emailCheckLoading, setEmailCheckLoading] = useState(false);
     const [nicknameError, setNicknameError] = useState<string | null>(null);
     const [emailError, setEmailError] = useState<string | null>(null);
+    const [nicknameSuccess, setNicknameSuccess] = useState<string | null>(null); // Success state for nickname
+    const [emailSuccess, setEmailSuccess] = useState<string | null>(null);       // Success state for email
     const [isNicknameValid, setIsNicknameValid] = useState(false);
     const [isEmailValid, setIsEmailValid] = useState(false);
 
-    const handleNicknameCheckSuccess = () => setIsNicknameValid(true);
-    const handleNicknameCheckFailure = () => setIsNicknameValid(false);
+    const handleNicknameCheckSuccess = () => {
+        setIsNicknameValid(true);
+        setNicknameError(null);
+        setNicknameSuccess("Nickname is available!");
+    };
 
-    const handleEmailCheckSuccess = () => setIsEmailValid(true);
-    const handleEmailCheckFailure = () => setIsEmailValid(false);
+    const handleNicknameCheckFailure = () => {
+        setIsNicknameValid(false);
+        setNicknameError('Nickname is already taken.');
+        setNicknameSuccess(null);
+    };
+
+    const handleEmailCheckSuccess = () => {
+        setIsEmailValid(true);
+        setEmailError(null);
+        setEmailSuccess("Email is available!");
+    };
+
+    const handleEmailCheckFailure = () => {
+        setIsEmailValid(false);
+        setEmailError('Email is already taken.');
+        setEmailSuccess(null);
+    };
 
     const isApplyButtonDisabled = !isNicknameValid || !isEmailValid || loading || nicknameCheckLoading || emailCheckLoading;
 
@@ -40,27 +59,24 @@ const AccountApplyPage: React.FC = () => {
             </Typography>
 
             <Box sx={inputContainerStyles}>
-                <NicknameInputTextField />
+                <NicknameInputTextField value={accountInfo.nickname} error={nicknameError} success={nicknameSuccess} />
                 <CheckNicknameDuplicationButton
                     onCheckSuccess={handleNicknameCheckSuccess}
                     onCheckFailure={handleNicknameCheckFailure}
-                    setError={setNicknameError}
                 />
-                {nicknameError && <Typography color="error">{nicknameError}</Typography>}
             </Box>
 
             <Box sx={inputContainerStyles}>
-                <EmailInputTextField value={accountInfo.email} error={emailError} />
+                <EmailInputTextField value={accountInfo.email} error={emailError} success={emailSuccess} />
                 <CheckEmailDuplicationButton
-                    onError={setEmailError}
+                    onCheckSuccess={handleEmailCheckSuccess}
+                    onCheckFailure={handleEmailCheckFailure}
                 />
             </Box>
 
             <Box sx={buttonContainerStyles}>
                 <AccountApplyButton disabled={isApplyButtonDisabled} />
-                <ApplyCancelButton
-                    sx={buttonStyles}
-                />
+                <ApplyCancelButton sx={buttonStyles} />
             </Box>
         </Box>
     );
