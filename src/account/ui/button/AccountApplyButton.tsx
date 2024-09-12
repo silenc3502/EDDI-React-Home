@@ -1,20 +1,39 @@
-// AccountApplyButton.tsx
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@mui/material/Button';
+import { useRecoilValue } from 'recoil';
+import { accountInfoState } from "../../atom_state/AccountState";
+import axiosInstance from "../../../api/AxiosInstance";
 
 interface AccountApplyButtonProps {
-    onClick: () => void;
-    loading: boolean;
     sx?: object;
+    disabled: boolean;
 }
 
-const AccountApplyButton: React.FC<AccountApplyButtonProps> = ({ onClick, loading, sx }) => {
+const AccountApplyButton: React.FC<AccountApplyButtonProps> = ({ sx, disabled }) => {
+    const accountInfo = useRecoilValue(accountInfoState); // Fetching Recoil state
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async () => {
+        setLoading(true);
+        try {
+            const response = await axiosInstance.post('/account/apply', {
+                nickname: accountInfo.nickname,
+                email: accountInfo.email
+            });
+            console.log('Account apply success:', response.data);
+        } catch (error) {
+            console.error('Account apply failed:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <Button
             variant="contained"
             color="primary"
-            onClick={onClick}
-            disabled={loading}
+            onClick={handleSubmit}
+            disabled={loading || disabled}
             sx={{
                 ...sx,
                 height: 56,

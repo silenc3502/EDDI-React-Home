@@ -8,6 +8,12 @@ import axiosInstance from "../../api/AxiosInstance";
 import ApplyCancelButton from "../ui/button/ApplyCancelButton";
 import CheckEmailDuplicationButton from "../ui/button/CheckEmailDuplicationButton";
 import EmailInputTextField from "../ui/text_field/EmailInputTextField";
+import NicknameInputTextField from "../ui/text_field/NicknameInputTextField";
+import CheckNicknameDuplicationButton from "../ui/button/CheckNicknameDuplicationButton";
+import {buttonStyles} from "../ui/style/ButtonStyles";
+import {buttonContainerStyles} from "../ui/style/ButtonContainerStyles";
+import {inputContainerStyles} from "../ui/style/InputContainerStyles";
+import {containerStyles} from "../ui/style/ContainerStyles";
 
 const AccountApplyPage: React.FC = () => {
     const [accountInfo, setAccountInfo] = useRecoilState(accountInfoState);
@@ -16,146 +22,44 @@ const AccountApplyPage: React.FC = () => {
     const [emailCheckLoading, setEmailCheckLoading] = useState(false);
     const [nicknameError, setNicknameError] = useState<string | null>(null);
     const [emailError, setEmailError] = useState<string | null>(null);
+    const [isNicknameValid, setIsNicknameValid] = useState(false);
+    const [isEmailValid, setIsEmailValid] = useState(false);
 
-    const handleNicknameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setAccountInfo((prevState) => ({
-            ...prevState,
-            nickname: event.target.value,
-        }));
-    };
+    const handleNicknameCheckSuccess = () => setIsNicknameValid(true);
+    const handleNicknameCheckFailure = () => setIsNicknameValid(false);
 
-    const handleSubmit = async () => {
-        setLoading(true);
-        try {
-            const response = await axiosInstance.post('/account/apply', {
-                nickname: accountInfo.nickname,
-                email: accountInfo.email
-            });
-            console.log('Account apply success:', response.data);
-        } catch (error) {
-            console.error('Account apply failed:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const handleEmailCheckSuccess = () => setIsEmailValid(true);
+    const handleEmailCheckFailure = () => setIsEmailValid(false);
 
-    const handleCheckNickname = async () => {
-        setNicknameCheckLoading(true);
-        setNicknameError(null);
-        try {
-            const response = await axiosInstance.post('/account/check-nickname-duplication', {
-                nickname: accountInfo.nickname
-            });
-            if (response.data) {
-                setNicknameError('Nickname is already taken.');
-            } else {
-                setNicknameError(null);
-            }
-        } catch (error) {
-            console.error('Error checking nickname duplication:', error);
-            setNicknameError('Error checking nickname duplication.');
-        } finally {
-            setNicknameCheckLoading(false);
-        }
-    };
-
-    const handleCheckEmail = async () => {
-        setEmailCheckLoading(true);
-        setEmailError(null);
-        try {
-            const response = await axiosInstance.post('/account/check-email-duplication', {
-                email: accountInfo.email
-            });
-            if (response.data) {
-                setEmailError('Email is already taken.');
-            } else {
-                setEmailError(null);
-            }
-        } catch (error) {
-            console.error('Error checking email duplication:', error);
-            setEmailError('Error checking email duplication.');
-        } finally {
-            setEmailCheckLoading(false);
-        }
-    };
+    const isApplyButtonDisabled = !isNicknameValid || !isEmailValid || loading || nicknameCheckLoading || emailCheckLoading;
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: '2rem',
-                width: '100%',
-                maxWidth: '600px',
-                mx: 'auto'
-            }}
-        >
+        <Box sx={containerStyles}>
             <Typography variant="h5" gutterBottom>
                 Apply for Account
             </Typography>
 
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    width: '100%',
-                    marginBottom: '1rem'
-                }}
-            >
-                <TextField
-                    label="Nickname"
-                    value={accountInfo.nickname}
-                    onChange={handleNicknameChange}
-                    variant="outlined"
-                    margin="normal"
-                    fullWidth
-                    sx={{ height: 56 }}
+            <Box sx={inputContainerStyles}>
+                <NicknameInputTextField />
+                <CheckNicknameDuplicationButton
+                    onCheckSuccess={handleNicknameCheckSuccess}
+                    onCheckFailure={handleNicknameCheckFailure}
+                    setError={setNicknameError}
                 />
-                <Button
-                    onClick={handleCheckNickname}
-                    variant="outlined"
-                    sx={{
-                        marginLeft: '1rem',
-                        height: 56,
-                        display: 'flex',
-                        alignItems: 'center',
-                        whiteSpace: 'nowrap',
-                        minWidth: '160px',
-                        marginTop: '8px'
-                    }}
-                >
-                    Check Nickname
-                </Button>
+                {nicknameError && <Typography color="error">{nicknameError}</Typography>}
             </Box>
 
-            <Box
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    width: '100%',
-                    marginBottom: '1rem'
-                }}
-            >
-                <EmailInputTextField value={accountInfo.email} />
-                <CheckEmailDuplicationButton onClick={handleCheckEmail} />
+            <Box sx={inputContainerStyles}>
+                <EmailInputTextField value={accountInfo.email} error={emailError} />
+                <CheckEmailDuplicationButton
+                    onError={setEmailError}
+                />
             </Box>
 
-            <Box
-                sx={{
-                    display: 'flex',
-                    gap: '1rem',
-                    marginTop: '1rem'
-                }}
-            >
-                <AccountApplyButton
-                    onClick={handleSubmit}
-                    loading={loading}
-                    sx={{ flexGrow: 1 }}
-                />
+            <Box sx={buttonContainerStyles}>
+                <AccountApplyButton disabled={isApplyButtonDisabled} />
                 <ApplyCancelButton
-                    sx={{ flexGrow: 1 }}
+                    sx={buttonStyles}
                 />
             </Box>
         </Box>
