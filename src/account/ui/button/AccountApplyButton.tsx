@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 import { useRecoilValue } from 'recoil';
+import { useNavigate } from 'react-router-dom';
 import { accountInfoState } from "../../atom_state/AccountState";
 import axiosInstance from "../../../api/AxiosInstance";
 
@@ -12,6 +13,7 @@ interface AccountApplyButtonProps {
 const AccountApplyButton: React.FC<AccountApplyButtonProps> = ({ sx, disabled }) => {
     const accountInfo = useRecoilValue(accountInfoState); // Fetching Recoil state
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
 
     const handleSubmit = async () => {
         setLoading(true);
@@ -21,6 +23,7 @@ const AccountApplyButton: React.FC<AccountApplyButtonProps> = ({ sx, disabled })
                 email: accountInfo.email
             });
             console.log('Account apply success:', response.data);
+            navigate('/')
         } catch (error) {
             console.error('Account apply failed:', error);
         } finally {
