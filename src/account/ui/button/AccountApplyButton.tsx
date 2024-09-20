@@ -22,7 +22,8 @@ const AccountApplyButton: React.FC<AccountApplyButtonProps> = ({ sx, disabled })
                 nickname: accountInfo.nickname,
                 email: accountInfo.email
             });
-            console.log('Account apply success:', response.data);
+            const userToken = response.data
+            localStorage.setItem('userToken', userToken)
             navigate('/')
         } catch (error) {
             console.error('Account apply failed:', error);
