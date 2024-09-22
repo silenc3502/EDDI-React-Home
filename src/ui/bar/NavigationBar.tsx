@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -8,9 +8,21 @@ import { Link, useNavigate } from "react-router-dom";
 
 const NavigationBar: React.FC = () => {
     const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+
+    useEffect(() => {
+        const token = localStorage.getItem('userToken');
+        setIsLoggedIn(!!token);
+    }, []);
 
     const handleLogin = () => {
         navigate('/github-login');
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('userToken');
+        setIsLoggedIn(false);
+        navigate('/');
     };
 
     return (
@@ -38,9 +50,15 @@ const NavigationBar: React.FC = () => {
                             </Typography>
                         </Link>
                     </Box>
-                    <Button color="inherit" onClick={handleLogin}>
-                        Login
-                    </Button>
+                    {isLoggedIn ? (
+                        <Button color="inherit" onClick={handleLogout}>
+                            Logout
+                        </Button>
+                    ) : (
+                        <Button color="inherit" onClick={handleLogin}>
+                            Login
+                        </Button>
+                    )}
                 </Toolbar>
             </AppBar>
         </Box>
