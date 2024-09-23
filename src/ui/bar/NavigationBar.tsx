@@ -1,14 +1,21 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { Link, useNavigate } from "react-router-dom";
+import FolderIcon from '@mui/icons-material/Folder'; // 저장소 아이콘
+import LoginIcon from '@mui/icons-material/Login'; // 로그인 아이콘
+import LogoutIcon from '@mui/icons-material/Logout'; // 로그아웃 아이콘
 
 const NavigationBar: React.FC = () => {
     const navigate = useNavigate();
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
 
     useEffect(() => {
         const token = localStorage.getItem('userToken');
@@ -23,6 +30,19 @@ const NavigationBar: React.FC = () => {
         localStorage.removeItem('userToken');
         setIsLoggedIn(false);
         navigate('/');
+    };
+
+    const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleProjectManagementClick = () => {
+        navigate('/projects');
+        handleMenuClose();
     };
 
     return (
@@ -50,12 +70,39 @@ const NavigationBar: React.FC = () => {
                             </Typography>
                         </Link>
                     </Box>
+                    <Box sx={{ position: 'relative' }}>
+                        <Button
+                            color="inherit"
+                            onMouseEnter={handleMenuOpen}
+                            startIcon={<FolderIcon />} // 저장소 아이콘 추가
+                        >
+                            저장소
+                        </Button>
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleMenuClose}
+                            MenuListProps={{
+                                onMouseLeave: handleMenuClose,
+                            }}
+                            anchorOrigin={{
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                            }}
+                            transformOrigin={{
+                                vertical: 'top',
+                                horizontal: 'left',
+                            }}
+                        >
+                            <MenuItem onClick={handleProjectManagementClick}>프로젝트 관리</MenuItem>
+                        </Menu>
+                    </Box>
                     {isLoggedIn ? (
-                        <Button color="inherit" onClick={handleLogout}>
+                        <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}> {/* 로그아웃 아이콘 추가 */}
                             Logout
                         </Button>
                     ) : (
-                        <Button color="inherit" onClick={handleLogin}>
+                        <Button color="inherit" onClick={handleLogin} startIcon={<LoginIcon />}> {/* 로그인 아이콘 추가 */}
                             Login
                         </Button>
                     )}
@@ -64,6 +111,5 @@ const NavigationBar: React.FC = () => {
         </Box>
     );
 };
-
 
 export default NavigationBar;
