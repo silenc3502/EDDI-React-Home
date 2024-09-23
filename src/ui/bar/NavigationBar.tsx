@@ -41,7 +41,7 @@ const NavigationBar: React.FC = () => {
     };
 
     const handleProjectManagementClick = () => {
-        navigate('/projects');
+        navigate('/project-manage/list');
         handleMenuClose();
     };
 
